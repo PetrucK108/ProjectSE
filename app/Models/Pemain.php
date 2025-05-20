@@ -12,13 +12,22 @@ class Pemain extends Model
     protected $table = 'pemain';
 
     protected $fillable = [
+        'user_id',
         'nama',
         'nomor',
         'umur',
         'jurusan',
         'angkatan',
+        'posisi',
         'gol',
         'assist',
-        'clean_sheet'
+        'goals_conceded',
     ];
+
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

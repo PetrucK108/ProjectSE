@@ -20,9 +20,33 @@ class HalamanController extends Controller
 
     public function showProfilForm()
     {
-        $players = Pemain::all();
-        return view('Sidebar.profil', compact('players'));
+        $players = Pemain::where('user_id', Auth::id())->get();
+
+        $totalGol = $players->sum('gol');
+        $jumlahPertandingan = 25;
+
+        $avg_gol = $jumlahPertandingan > 0 ? $totalGol / $jumlahPertandingan : 0;
+
+        $kiper = $players->where('posisi', 'kiper');
+        $totalConceded = $kiper->sum('goals_conceded');
+        $avgConceded = $jumlahPertandingan > 0 ? $totalConceded / $jumlahPertandingan : 0;
+
+
+
+        $avgAge = $players->count() > 0 ? $players->avg('umur') : 0;
+        $squadSize = $players->count();
+
+        return view('Sidebar.profil', compact(
+            'players',
+            'avg_gol',
+            'totalConceded',
+            'avgConceded',
+            'avgAge',
+            'squadSize'
+        ));
     }
+
+
 
     public function storePlayer(Request $request)
     {
@@ -31,21 +55,33 @@ class HalamanController extends Controller
             'nomor' => 'required|integer',
             'umur' => 'required|integer',
             'jurusan' => 'required|string|max:255',
-            'angkatan' => 'required|string|max:10',
+            'angkatan' => 'required|string|max:255',
+            'posisi' => 'required|string|in:Kiper,Anchor,Pivot,Flank',
         ]);
 
         Pemain::create([
-            'nama' => $validated['nama'],
-            'nomor' => $validated['nomor'],
-            'umur' => $validated['umur'],
-            'jurusan' => $validated['jurusan'],
-            'angkatan' => $validated['angkatan'],
+            'user_id' => Auth::id(),
+            'nama' => $request->nama,
+            'nomor' => $request->nomor,
+            'umur' => $request->umur,
+            'jurusan' => $request->jurusan,
+            'angkatan' => $request->angkatan,
+            'posisi' => $request->posisi,
             'gol' => 0,
             'assist' => 0,
-            'clean_sheet' => 0,
+            'goals_conceded' => 0,
         ]);
 
         return redirect()->route('profil')->with('success', 'Pemain berhasil ditambahkan');
+    }
+
+
+    public function destroy($id)
+    {
+        $pemain = Pemain::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $pemain->delete();
+
+        return redirect()->back()->with('success', 'Pemain berhasil dihapus.');
     }
 
     public function showFindForm()
@@ -69,5 +105,22 @@ class HalamanController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/login');
+    }
+
+    public function updateProfilTim(Request $request)
+    {
+        $request->validate([
+            'skill_level' => 'required|string',
+            'gaya_bermain' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+        if ($user instanceof \App\Models\User) {
+            $user->skill_level = $request->skill_level;
+            $user->gaya_bermain = $request->gaya_bermain;
+            $user->save();
+        }
+
+        return redirect()->route('profil')->with('success', 'Profil tim berhasil diperbarui.');
     }
 }

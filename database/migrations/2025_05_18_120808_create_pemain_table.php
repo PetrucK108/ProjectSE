@@ -14,7 +14,7 @@ return new class extends Migration
             $table->integer('nomor');
             $table->integer('umur');
             $table->string('jurusan');
-            $table->string('angkatan'); // contoh: B27
+            $table->string('angkatan');
             $table->integer('gol')->default(0);
             $table->integer('assist')->default(0);
             $table->integer('clean_sheet')->default(0);

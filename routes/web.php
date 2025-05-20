@@ -24,6 +24,8 @@ Route::get('/recent-matches', [HalamanController::class, 'showRecentMatchesForm'
 
 Route::get('/profil', [HalamanController::class, 'showProfilForm'])->middleware('auth')->name('profil');
 Route::post('/profil', [HalamanController::class, 'storePlayer'])->middleware('auth')->name('profil.store');
+Route::delete('/profil/{id}', [HalamanController::class, 'destroy'])->name('profil.destroy');
+Route::post('/profil/tim/update', [HalamanController::class, 'updateProfilTim'])->name('profil.tim.update');
 
 Route::get('/find', [HalamanController::class, 'showFindForm'])->middleware('auth')->name('find');
 Route::get('/sewa', [HalamanController::class, 'showSewaForm'])->middleware('auth')->name('sewa');
