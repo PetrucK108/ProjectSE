@@ -93,9 +93,9 @@
             <form method="POST" action="{{ route('profil.tim.update') }}" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-gray-600 mb-1">Tingkat Keterampilan</label>
+                    <label class="block text-gray-600 mb-1">Skill Level</label>
                     <select name="skill_level" class="w-full border rounded-md px-3 py-2" required>
-                        <option value="">Pilih Tingkatan</option>
+                        <option value="">Choose ur Skill</option>
                         @foreach (['Beginner', 'Intermediate', 'Advanced', 'Professional'] as $level)
                             <option value="{{ $level }}" {{ Auth::user()->skill_level == $level ? 'selected' : '' }}>
                                 {{ $level }}

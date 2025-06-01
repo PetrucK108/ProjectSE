@@ -84,11 +84,6 @@ class HalamanController extends Controller
         return redirect()->back()->with('success', 'Pemain berhasil dihapus.');
     }
 
-    public function showFindForm()
-    {
-        return view('Sidebar.find');
-    }
-
     public function showSewaForm()
     {
         return view('Sidebar.sewa');
@@ -104,20 +99,35 @@ class HalamanController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+        return redirect()->route('login')->with('success', 'Anda telah berhasil logout.');
     }
 
     public function updateProfilTim(Request $request)
     {
         $request->validate([
-            'skill_level' => 'required|string',
-            'gaya_bermain' => 'required|string',
+            'skill_level' => 'required|in:Beginner,Intermediate,Advanced,Professional',
+            'gaya_bermain' => 'required|in:Ultra Attacking,Attacking,Balanced,Defensive,Ultra Defensive',
         ]);
+
+        $skillMap = [
+            'Beginner' => 1,
+            'Intermediate' => 2,
+            'Advanced' => 3,
+            'Professional' => 4,
+        ];
+
+        $styleMap = [
+            'Ultra Attacking' => 1,
+            'Attacking' => 2,
+            'Balanced' => 3,
+            'Defensive' => 4,
+            'Ultra Defensive' => 5,
+        ];
 
         $user = Auth::user();
         if ($user instanceof \App\Models\User) {
-            $user->skill_level = $request->skill_level;
-            $user->gaya_bermain = $request->gaya_bermain;
+            $user->skill_level = $skillMap[$request->input('skill_level')];
+            $user->gaya_bermain = $styleMap[$request->input('gaya_bermain')];
             $user->save();
         }
 

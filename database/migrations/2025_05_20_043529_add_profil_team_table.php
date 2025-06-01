@@ -10,10 +10,16 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('skill_level')->nullable();
-            $table->string('gaya_bermain')->nullable();
+            if (!Schema::hasColumn('users', 'skill_level')) {
+                $table->string('skill_level')->nullable();
+            }
+
+            if (!Schema::hasColumn('users', 'gaya_bermain')) {
+                $table->string('gaya_bermain')->nullable();
+            }
         });
     }
+
 
 
     public function down(): void
