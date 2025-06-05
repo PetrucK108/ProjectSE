@@ -105,23 +105,24 @@ class HalamanController extends Controller
     public function updateProfilTim(Request $request)
     {
         $request->validate([
-            'skill_level' => 'required|in:Beginner,Intermediate,Advanced,Professional',
-            'gaya_bermain' => 'required|in:Ultra Attacking,Attacking,Balanced,Defensive,Ultra Defensive',
+            'skill_level' => 'required|integer|between:1,4',
+            'gaya_bermain' => 'required|integer|between:1,5',
         ]);
 
+        // Tambahkan ini
         $skillMap = [
-            'Beginner' => 1,
-            'Intermediate' => 2,
-            'Advanced' => 3,
-            'Professional' => 4,
+            1 => 'Beginner',
+            2 => 'Intermediate',
+            3 => 'Advanced',
+            4 => 'Professional'
         ];
 
         $styleMap = [
-            'Ultra Attacking' => 1,
-            'Attacking' => 2,
-            'Balanced' => 3,
-            'Defensive' => 4,
-            'Ultra Defensive' => 5,
+            1 => 'Ultra Defensive',
+            2 => 'Defensive',
+            3 => 'Balanced',
+            4 => 'Attacking',
+            5 => 'Ultra Attacking'
         ];
 
         $user = Auth::user();

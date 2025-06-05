@@ -32,7 +32,7 @@ class TeamSwipeController extends Controller
 
         foreach ([0, 1, 2] as $diff) {
             $sameLevelTeams = $allTeams->filter(function ($team) use ($user, $diff) {
-                return abs($team->skill_level - $user->skill_level) == $diff;
+                return abs((int)$team->skill_level - (int)$user->skill_level) == $diff;
             });
 
             $prioritized = $sameLevelTeams->sortBy(function ($team) use ($user) {

@@ -94,25 +94,22 @@
                 @csrf
                 <div>
                     <label class="block text-gray-600 mb-1">Skill Level</label>
-                    <select name="skill_level" class="w-full border rounded-md px-3 py-2" required>
-                        <option value="">Choose ur Skill</option>
-                        @foreach (['Beginner', 'Intermediate', 'Advanced', 'Professional'] as $level)
-                            <option value="{{ $level }}" {{ Auth::user()->skill_level == $level ? 'selected' : '' }}>
-                                {{ $level }}
-                            </option>
-                        @endforeach
+                    <select name="skill_level" class="w-full border rounded-md px-3 py-2">
+                        <option value="1">Beginner</option>
+                        <option value="2">Intermediate</option>
+                        <option value="3">Advanced</option>
+                        <option value="4">Professional</option>
                     </select>
                 </div>
 
                 <div>
                     <label class="block text-gray-600 mb-1">Gaya Bermain</label>
-                    <select name="gaya_bermain" class="w-full border rounded-md px-3 py-2" required>
-                        <option value="">Pilih Gaya</option>
-                        @foreach (['Ultra Attacking', 'Attacking', 'Balanced', 'Defensive', 'Ultra Defensive'] as $gaya)
-                            <option value="{{ $gaya }}" {{ Auth::user()->gaya_bermain == $gaya ? 'selected' : '' }}>
-                                {{ $gaya }}
-                            </option>
-                        @endforeach
+                    <select name="gaya_bermain" class="w-full border rounded-md px-3 py-2">
+                        <option value="1">Ultra Defensive</option>
+                        <option value="2">Defensive</option>
+                        <option value="3">Balanced</option>
+                        <option value="4">Attacking</option>
+                        <option value="5">Ultra Attacking</option>
                     </select>
                 </div>
 
@@ -123,7 +120,6 @@
         </div>
 
 
-        {{-- TAMBAH PEMAIN --}}
         <div class="bg-gray-50 rounded-xl shadow-md p-6 border-l-4 border-gray-800 transition-base">
             <h3 class="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
                 <i data-lucide="plus-circle" class="w-5 h-5 text-gray-800"></i> Tambah Pemain
