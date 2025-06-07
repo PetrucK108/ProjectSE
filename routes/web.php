@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profil', [HalamanController::class, 'storePlayer'])->name('profil.store');
     Route::delete('/profil/{id}', [HalamanController::class, 'destroy'])->name('profil.destroy');
     Route::post('/profil/tim/update', [HalamanController::class, 'updateProfilTim'])->name('profil.tim.update');
+    Route::post('/profil/tim/edit', [HalamanController::class, 'editProfilTim'])->name('profil.tim.edit');
 
     // Fitur Find & Swipe
     Route::get('/find', [TeamSwipeController::class, 'index'])->name('find');

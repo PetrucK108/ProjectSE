@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'jurusan',
         'skill_level',
         'avg_gol',
         'avgConceded',

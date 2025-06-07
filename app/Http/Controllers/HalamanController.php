@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Pemain;
 
 class HalamanController extends Controller
@@ -131,6 +132,29 @@ class HalamanController extends Controller
             $user->gaya_bermain = $styleMap[$request->input('gaya_bermain')];
             $user->save();
         }
+
+        return redirect()->route('profil')->with('success', 'Profil tim berhasil diperbarui.');
+    }
+
+    public function editProfilTim(Request $request)
+    {
+        $request->validate([
+            'nama_tim' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . Auth::id(),
+            'phone' => 'nullable|string|max:20',
+            'password' => 'nullable|string|min:6',
+        ]);
+
+        $user = Auth::user();
+        $user->name = $request->nama_tim;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
 
         return redirect()->route('profil')->with('success', 'Profil tim berhasil diperbarui.');
     }
