@@ -41,6 +41,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/find', [TeamSwipeController::class, 'index'])->name('find');
     Route::post('/swipe-action', [TeamSwipeController::class, 'handleSwipe'])->name('swipe.action');
 
+    // Legacy swipe route for backward compatibility
+    Route::post('/swipe', [TeamSwipeController::class, 'swipe'])->name('swipe');
+
     // Like user (optional anonymous fallback check)
     Route::post('/like/{id}', function ($id) {
         DB::table('likes')->insert([
