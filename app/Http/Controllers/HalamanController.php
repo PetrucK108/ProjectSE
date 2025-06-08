@@ -4,15 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Pemain;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 class HalamanController extends Controller
 {
-    public function showHomeForm()
-    {
-        return view('Home.home');
-    }
-
     public function showRecentMatchesForm()
     {
         return view('Sidebar.recent-matches');
@@ -129,6 +127,40 @@ class HalamanController extends Controller
         if ($user instanceof \App\Models\User) {
             $user->skill_level = $skillMap[$request->input('skill_level')];
             $user->gaya_bermain = $styleMap[$request->input('gaya_bermain')];
+            $user->save();
+        }
+
+        return redirect()->route('profil')->with('success', 'Profil tim berhasil diperbarui.');
+    }
+
+    public function editProfilTim(Request $request)
+    {
+        $request->validate([
+            'nama_tim' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . Auth::id(),
+            'phone' => 'nullable|string|max:20',
+            'password' => 'nullable|string|min:6',
+            'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $user = Auth::user();
+        if ($user instanceof \App\Models\User) {
+            $user->name = $request->nama_tim;
+            $user->email = $request->email;
+            $user->phone = $request->phone;
+
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+
+            if ($request->hasFile('foto_profil')) {
+                $image = $request->file('foto_profil');
+                $filename = 'profil_' . $user->id . '.' . $image->getClientOriginalExtension();
+                $path = public_path('uploads/profil/' . $filename);
+
+                $user->foto_profil = 'uploads/profil/' . $filename;
+            }
+
             $user->save();
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -13,11 +14,9 @@ class LoginController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            return redirect()->route('home');
+            // Ganti redirect ke route 'profil'
+            return redirect()->route('profil');
         }
-
-        // debug
-        dd('Login gagal', $credentials, User::where('email', $request->email)->first());
 
         return back()->withErrors([
             'email' => 'Email atau password salah.',
@@ -29,4 +28,3 @@ class LoginController extends Controller
         return view('Auth.login');
     }
 }
-?>

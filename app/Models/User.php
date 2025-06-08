@@ -21,11 +21,14 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'jurusan',
         'skill_level',
         'avg_gol',
         'avgConceded',
         'gaya_bermain',
     ];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -46,5 +49,13 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Get the players for the team.
+     */
+    public function pemain()
+    {
+        return $this->hasMany(\App\Models\Pemain::class);
     }
 }

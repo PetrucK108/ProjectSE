@@ -13,12 +13,13 @@ class TeamSwipeController extends Controller
     {
         $user = Auth::user();
 
+        // Check if user has completed their profile
         if (!$user->skill_level || !$user->gaya_bermain) {
             return redirect()->route('profil')->with('error', 'Lengkapi Skill Level dan Play Style untuk menggunakan fitur ini.');
         }
 
-        // Ambil semua tim lain yang belum diswipe oleh user ini
-        $allTeams = User::where('id', '!=', $user->id)
+        // Get all teams that haven't been swiped by current user
+        $availableTeams = User::where('id', '!=', $user->id)
             ->whereNotIn('id', function ($query) use ($user) {
                 $query->select('target_user_id')
                     ->from('swipes')
@@ -26,32 +27,32 @@ class TeamSwipeController extends Controller
             })
             ->whereNotNull('skill_level')
             ->whereNotNull('gaya_bermain')
+            ->with('pemain') // Load players relationship
             ->get();
 
-        $matches = collect();
-
-        foreach ([0, 1, 2] as $diff) {
-            $sameLevelTeams = $allTeams->filter(function ($team) use ($user, $diff) {
-                return abs((int)$team->skill_level - (int)$user->skill_level) == $diff;
-            });
-
-            $prioritized = $sameLevelTeams->sortBy(function ($team) use ($user) {
-                return $this->playStylePriority($user->gaya_bermain, $team->gaya_bermain);
-            });
-
-            $matches = $matches->merge($prioritized);
+        if ($availableTeams->isEmpty()) {
+            return view('Sidebar.find', ['teamToShow' => null]);
         }
 
-        // Ambil satu rekomendasi teratas
-        $teamToShow = $matches->first();
+        // Smart recommendation algorithm
+        $recommendations = $this->getSmartRecommendations($user, $availableTeams);
+
+        // Get the first recommendation
+        $teamToShow = $recommendations->first();
 
         return view('Sidebar.find', compact('teamToShow'));
     }
 
-    public function swipe(Request $request)
+    public function handleSwipe(Request $request)
     {
+        $request->validate([
+            'target_user_id' => 'required|exists:users,id',
+            'action' => 'required|in:accept,decline'
+        ]);
+
         $user = Auth::user();
 
+        // Record the swipe
         DB::table('swipes')->insert([
             'user_id' => $user->id,
             'target_user_id' => $request->target_user_id,
@@ -60,84 +61,116 @@ class TeamSwipeController extends Controller
             'updated_at' => now()
         ]);
 
-        return redirect()->route('team-swipe.index');
+        // If it's an accept, also record in likes table for compatibility
+        if ($request->action === 'accept') {
+            DB::table('likes')->insertOrIgnore([
+                'user_id' => $user->id,
+                'liked_user_id' => $request->target_user_id,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
+
+        return redirect()->route('find')->with(
+            'success',
+            $request->action === 'accept' ? 'Tim berhasil disukai!' : 'Tim dilewati'
+        );
     }
 
-    private function playStylePriority($userStyle, $targetStyle)
+    private function getSmartRecommendations(User $user, $availableTeams)
     {
-        $priorityMap = [
-            'Ultra Attacking' => ['Ultra Defensive', 'Defensive', 'Balanced', 'Attacking', 'Ultra Attacking'],
-            'Attacking' => ['Defensive', 'Balanced', 'Attacking', 'Ultra Defensive', 'Ultra Attacking'],
-            'Balanced' => ['Balanced', 'Attacking', 'Defensive', 'Ultra Attacking', 'Ultra Defensive'],
-            'Defensive' => ['Attacking', 'Balanced', 'Defensive', 'Ultra Attacking', 'Ultra Defensive'],
-            'Ultra Defensive' => ['Ultra Attacking', 'Attacking', 'Balanced', 'Defensive', 'Ultra Defensive'],
+        return $availableTeams->map(function ($team) use ($user) {
+            $score = $this->calculateCompatibilityScore($user, $team);
+            $team->compatibility_score = $score;
+            return $team;
+        })->sortByDesc('compatibility_score');
+    }
+
+    private function calculateCompatibilityScore(User $user, User $team)
+    {
+        $score = 0;
+
+        // Skill level compatibility (40% weight)
+        $skillLevelMap = [
+            'Beginner' => 1,
+            'Intermediate' => 2,
+            'Advanced' => 3,
+            'Professional' => 4
         ];
 
-        return array_search($targetStyle, $priorityMap[$userStyle] ?? []) ?? 999;
+        $userSkillLevel = $skillLevelMap[$user->skill_level] ?? 0;
+        $teamSkillLevel = $skillLevelMap[$team->skill_level] ?? 0;
+
+        $skillDifference = abs($userSkillLevel - $teamSkillLevel);
+        $skillScore = max(0, (4 - $skillDifference) / 4) * 40;
+        $score += $skillScore;
+
+        // Play style compatibility (30% weight)
+        $styleCompatibility = $this->getPlayStyleCompatibility($user->gaya_bermain, $team->gaya_bermain);
+        $score += $styleCompatibility * 30;
+
+        // Performance metrics (20% weight)
+        $avgGoalsDiff = abs(($user->avg_gol ?? 0) - ($team->avg_gol ?? 0));
+        $performanceScore = max(0, (5 - $avgGoalsDiff) / 5) * 20;
+        $score += $performanceScore;
+
+        // Team size factor (10% weight)
+        $teamSize = $team->pemain->count();
+        $optimalSize = 7; // Ideal team size
+        $sizeDiff = abs($teamSize - $optimalSize);
+        $sizeScore = max(0, (7 - $sizeDiff) / 7) * 10;
+        $score += $sizeScore;
+
+        return $score;
     }
 
-    // Optional: Hybrid recommendation (tidak dipanggil di index saat ini)
-
-    private function hybridRecommendations(User $user)
+    private function getPlayStyleCompatibility($userStyle, $teamStyle)
     {
-        $content = $this->contentBased($user);
-        $collab = $this->collaborativeFiltering($user);
-        $merged = $content->merge($collab)->unique('id');
+        // Compatibility matrix for play styles
+        $compatibilityMatrix = [
+            'Ultra Attacking' => [
+                'Ultra Defensive' => 1.0,
+                'Defensive' => 0.8,
+                'Balanced' => 0.6,
+                'Attacking' => 0.4,
+                'Ultra Attacking' => 0.2
+            ],
+            'Attacking' => [
+                'Ultra Defensive' => 0.8,
+                'Defensive' => 1.0,
+                'Balanced' => 0.8,
+                'Attacking' => 0.6,
+                'Ultra Attacking' => 0.4
+            ],
+            'Balanced' => [
+                'Ultra Defensive' => 0.6,
+                'Defensive' => 0.8,
+                'Balanced' => 1.0,
+                'Attacking' => 0.8,
+                'Ultra Attacking' => 0.6
+            ],
+            'Defensive' => [
+                'Ultra Defensive' => 0.4,
+                'Defensive' => 0.6,
+                'Balanced' => 0.8,
+                'Attacking' => 1.0,
+                'Ultra Attacking' => 0.8
+            ],
+            'Ultra Defensive' => [
+                'Ultra Defensive' => 0.2,
+                'Defensive' => 0.4,
+                'Balanced' => 0.6,
+                'Attacking' => 0.8,
+                'Ultra Attacking' => 1.0
+            ]
+        ];
 
-        return $merged->sortByDesc(fn($u) => $this->calculateHybridScore($user, $u));
+        return $compatibilityMatrix[$userStyle][$teamStyle] ?? 0.5;
     }
 
-    private function contentBased(User $user)
+    // Legacy method for backward compatibility
+    public function swipe(Request $request)
     {
-        return User::where('id', '!=', $user->id)
-            ->select('users.*')
-            ->selectRaw('
-                (1 - ABS(skill_level - ?)/5) * 0.25 +
-                (1 - ABS(avg_gol - ?)/10) * 0.25 +
-                (1 - ABS(avgConceded - ?)/10) * 0.25 +
-                (CASE WHEN gaya_bermain = ? THEN 1 ELSE 0 END) * 0.25 AS similarity_score
-            ', [
-                $user->skill_level,
-                $user->avg_gol,
-                $user->avgConceded,
-                $user->gaya_bermain,
-            ])
-            ->orderByDesc('similarity_score')
-            ->take(10)
-            ->get();
-    }
-
-    private function collaborativeFiltering(User $user)
-    {
-        $likedUserIds = DB::table('likes')
-            ->where('user_id', $user->id)
-            ->pluck('liked_user_id');
-
-        $otherUsers = DB::table('likes')
-            ->whereIn('user_id', $likedUserIds)
-            ->where('liked_user_id', '!=', $user->id)
-            ->groupBy('liked_user_id')
-            ->select('liked_user_id', DB::raw('count(*) as count'))
-            ->orderByDesc('count')
-            ->limit(10)
-            ->get();
-
-        return User::whereIn('id', $otherUsers->pluck('liked_user_id'))->get();
-    }
-
-    private function calculateHybridScore(User $base, User $other)
-    {
-        $contentScore =
-            (1 - abs($base->skill_level - $other->skill_level) / 5) * 0.25 +
-            (1 - abs($base->avg_gol - $other->avg_gol) / 10) * 0.25 +
-            (1 - abs($base->avgConceded - $other->avgConceded) / 10) * 0.25 +
-            ($base->gaya_bermain === $other->gaya_bermain ? 1 : 0) * 0.25;
-
-        $collabScore = DB::table('likes')
-            ->where('user_id', $base->id)
-            ->where('liked_user_id', $other->id)
-            ->exists() ? 1 : 0;
-
-        return ($contentScore * 0.7) + ($collabScore * 0.3);
+        return $this->handleSwipe($request);
     }
 }

@@ -13,19 +13,17 @@
 
         <!-- Logo -->
         <div class="p-6 flex items-center justify-center border-b border-gray-700">
-            <a href="{{ route('home') }}"
-                class="text-2xl font-extrabold text-cyan-400 hover:text-cyan-300 transition duration-300">
-                Futsal Matcher
+            <a href="javascript:void(0)" class="flex items-center space-x-2">
+                <img src="{{ asset('images/logo.png') }}" alt="Futsal Matcher Logo" class="h-24 object-contain">
             </a>
         </div>
 
-        <!-- User Info -->
-        <div class="p-6 flex flex-col items-center border-b border-gray-700">
-            <img src="{{ asset('images/yasi.jpg') }}" alt="User Avatar"
-                class="rounded-full w-24 h-24 object-cover border-4 border-cyan-400 shadow-lg">
-            <h2 class="text-lg font-semibold mt-3">{{ Auth::user()->name ?? 'PetrucK' }}</h2>
-            <p class="text-sm text-gray-400">{{ Auth::user()->email ?? 'PetrucK@example.com' }}</p>
-        </div>
+        @if(Auth::user()->foto_profil)
+    <img src="{{ asset(Auth::user()->foto_profil) }}" class="w-16 h-16 rounded-full object-cover" alt="Foto Profil Tim">
+@else
+    <img src="{{ asset('images/default-team.png') }}" class="w-16 h-16 rounded-full object-cover" alt="Default Foto">
+@endif
+
 
         <!-- Navigation -->
         <nav class="flex-1 px-4 py-6 space-y-2">

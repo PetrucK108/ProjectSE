@@ -10,7 +10,7 @@ use App\Http\Controllers\TeamSwipeController;
 
 // Redirect root
 Route::get('/', function () {
-    return redirect()->route(Auth::check() ? 'home' : 'login');
+    return redirect()->route(Auth::check() ? 'profil' : 'login');
 });
 
 // Guest Routes (Login & Register)
@@ -27,7 +27,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [HalamanController::class, 'logout'])->name('logout');
 
     // Halaman utama
-    Route::get('/home', [HalamanController::class, 'showHomeForm'])->name('home');
     Route::get('/recent-matches', [HalamanController::class, 'showRecentMatchesForm'])->name('recent-matches');
 
     // Profil Tim & Pemain
@@ -35,10 +34,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/profil', [HalamanController::class, 'storePlayer'])->name('profil.store');
     Route::delete('/profil/{id}', [HalamanController::class, 'destroy'])->name('profil.destroy');
     Route::post('/profil/tim/update', [HalamanController::class, 'updateProfilTim'])->name('profil.tim.update');
+    Route::post('/profil/tim/edit', [HalamanController::class, 'editProfilTim'])->name('profil.tim.edit');
 
     // Fitur Find & Swipe
     Route::get('/find', [TeamSwipeController::class, 'index'])->name('find');
     Route::post('/swipe-action', [TeamSwipeController::class, 'handleSwipe'])->name('swipe.action');
+
+    // Legacy swipe route for backward compatibility
+    Route::post('/swipe', [TeamSwipeController::class, 'swipe'])->name('swipe');
 
     // Like user (optional anonymous fallback check)
     Route::post('/like/{id}', function ($id) {

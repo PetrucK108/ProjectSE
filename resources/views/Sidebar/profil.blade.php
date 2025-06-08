@@ -8,7 +8,8 @@
             lucide.createIcons();
         });
     </script>
-
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -219,6 +220,62 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        {{-- EDIT PROFIL TIM --}}
+        <div class="bg-gray-50 rounded-xl shadow-md p-6 border-l-4 border-gray-800 transition-base">
+            <h3 class="text-xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
+                <i data-lucide="edit" class="w-5 h-5 text-gray-800"></i> Edit Profil Tim
+            </h3>
+            
+            <form method="POST" action="{{ route('profil.tim.edit') }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @csrf
+                <div>
+                    <label class="block text-gray-600 mb-1">Nama Tim</label>
+                    <input name="nama_tim" type="text" value="{{ Auth::user()->name }}" 
+                        class="w-full border rounded-md px-3 py-2" placeholder="Masukkan nama tim" required>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-600 mb-1">Password</label>
+                    <input name="password" type="password" 
+                        class="w-full border rounded-md px-3 py-2" placeholder="Password baru (kosongkan jika tidak ingin mengubah)">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-600 mb-1">Email Tim</label>
+                    <input name="email" type="email" value="{{ Auth::user()->email }}" 
+                        class="w-full border rounded-md px-3 py-2" placeholder="Email tim" required>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-600 mb-1">No Telepon</label>
+                    <input name="phone" type="text" value="{{ Auth::user()->phone }}" 
+                        class="w-full border rounded-md px-3 py-2" placeholder="Nomor telepon tim">
+                </div>
+
+                <div>
+                    <label class="block text-gray-600 mb-1">Foto Profil Tim</label>
+                    <input type="file" name="foto_profil" accept="image/*" class="w-full border rounded-md px-3 py-2">
+                </div>
+                
+                <div class="md:col-span-2 flex items-center gap-4">
+                    <button type="submit"
+                        class="bg-gray-800 text-white px-6 py-2 rounded-md 
+                        transition transform duration-200 ease-in-out 
+                        hover:scale-105 hover:bg-gray-700 
+                        active:scale-95">
+                        <i data-lucide="save" class="inline w-4 h-4 mr-2"></i> Simpan Perubahan
+                    </button>
+                    
+                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                        <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                            <i data-lucide="camera" class="w-5 h-5 text-gray-500"></i>
+                        </div>
+                        <span>Ganti Foto Profil Tim</span>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 @endsection
