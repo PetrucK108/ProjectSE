@@ -95,27 +95,57 @@
     </style>
 </head>
 
-<body class="bg-gray-900 flex items-center justify-center h-screen text-white">
-    <div class="neon-outline w-[400px] rounded-xl shadow-2xl">
-        <div class="card-content p-10">
-            <h2 class="text-2xl font-bold mb-8 text-center text-[#e0e7ef] tracking-wide">Sign in</h2>
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
-                <input type="email" name="email" placeholder="Email" required
-                    class="w-full mb-6 px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8] placeholder:text-[#64748b] transition" />
-                <input type="password" name="password" placeholder="Password" required
-                    class="w-full mb-2 px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8] placeholder:text-[#64748b] transition" />
-
-                <div class="flex justify-between text-xs mb-8 mt-2">
-                    <a href="#" class="text-[#64748b] hover:text-[#38bdf8] transition">Forgot Password?</a>
-                    <a href="{{ route('register') }}" class="text-[#7dd3fc] hover:text-[#818cf8] font-semibold transition">Signup</a>
+<body class="bg-gradient-to-br from-gray-900 via-gray-950 to-blue-950 flex items-center justify-center min-h-screen text-white">
+    <div class="relative flex flex-col items-center justify-center w-full min-h-screen">
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+            <div class="w-[540px] h-[540px] rounded-3xl bg-gradient-to-br from-blue-700/30 via-cyan-400/10 to-indigo-800/20 blur-2xl"></div>
+        </div>
+        <div class="neon-outline w-[480px] rounded-2xl shadow-2xl z-10">
+            <div class="card-content p-12">
+                <div class="flex flex-col items-center mb-8">
+                    <img src="{{ asset('images/logo.png') }}" alt="FutsalMatcher Logo" class="w-24 h-24 mb-2 drop-shadow-xl">
+                    <h2 class="text-4xl font-extrabold text-center text-[#e0e7ef] tracking-wide drop-shadow-lg mb-2">FutsalMatcher
+                    </h2>
+                    <span class="text-base text-cyan-300 font-semibold tracking-wider mb-2">Sign in to your account
+                    </span>
                 </div>
-
-                <button type="submit"
-                    class="w-full py-2 bg-white text-[#181829] font-semibold rounded shadow btn-press transition">Login</button>
-            </form>
+                @if(session('error'))
+                <div class="mb-4 text-[#f87171] text-center">{{ session('error') }}</div>
+                @endif
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+                    <div class="mb-8">
+                        <input type="email" name="email" placeholder="Gmail (example@gmail.com)" required
+                            class="w-full px-0 py-3 bg-transparent border-b-2 border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8] placeholder:text-[#64748b] transition text-lg"
+                            pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$" title="Masukkan Gmail yang valid" />
+                    </div>
+                    <div class="mb-4">
+                        <input type="password" name="password" placeholder="Password" required
+                            class="w-full px-0 py-3 bg-transparent border-b-2 border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8] placeholder:text-[#64748b] transition text-lg" />
+                    </div>
+                    <div class="flex justify-between text-xs mb-10 mt-2">
+                        {{-- <a href="#" class="text-[#64748b] hover:text-[#38bdf8] transition">Forgot Password?</a> --}}
+                        <span></span>
+                        <a href="{{ route('register') }}"
+                            class="text-[#7dd3fc] hover:text-[#818cf8] font-semibold transition">Register</a>
+                    </div>
+                    <button type="submit"
+                        class="w-full py-3 bg-gradient-to-r from-cyan-400 to-blue-600 text-white font-semibold rounded-xl shadow btn-press transition text-xl hover:scale-105 hover:shadow-xl tracking-wide">
+                        Login
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </body>
+<script>
+    // Disable browser back button
+    if (window.history && window.history.pushState) {
+        window.history.pushState('forward', null, window.location.href);
+        window.onpopstate = function () {
+            window.history.pushState('forward', null, window.location.href);
+        };
+    }
+</script>
 
 </html>

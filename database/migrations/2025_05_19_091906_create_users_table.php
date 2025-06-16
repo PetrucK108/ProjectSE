@@ -19,8 +19,6 @@ return new class extends Migration {
             $table->timestamps();
             $table->string('skill_level')->nullable();
             $table->string('gaya_bermain')->nullable();
-            $table->float('avg_gol')->nullable();
-            $table->float('avgConceded')->nullable();
         });
     }
 

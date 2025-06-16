@@ -9,5 +9,10 @@ class Team extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'skill_level', 'gaya_bermain', 'avg_gol', 'avgConceded'];
+    protected $fillable = ['name', 'skill_level', 'gaya_bermain', 'foto_tim'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

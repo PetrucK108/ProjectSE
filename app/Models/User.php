@@ -3,9 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Like;
+use App\Models\ChatContact;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
@@ -24,9 +26,14 @@ class User extends Authenticatable
         'phone',
         'jurusan',
         'skill_level',
-        'avg_gol',
-        'avgConceded',
         'gaya_bermain',
+        'foto_profil',
+    ];
+
+    // Tambahkan ini agar skill_level dan gaya_bermain tidak di-cast ke null saat login/logout
+    protected $attributes = [
+        'skill_level' => null,
+        'gaya_bermain' => null,
     ];
 
     /**
@@ -40,16 +47,13 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
 
     /**
      * Get the players for the team.
@@ -57,5 +61,13 @@ class User extends Authenticatable
     public function pemain()
     {
         return $this->hasMany(\App\Models\Pemain::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function contacts()
+    {
+        return $this->hasMany(ChatContact::class, 'user_id', 'id');
     }
 }

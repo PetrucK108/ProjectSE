@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
     // Profil Tim & Pemain
     Route::get('/profil', [HalamanController::class, 'showProfilForm'])->name('profil');
     Route::post('/profil', [HalamanController::class, 'storePlayer'])->name('profil.store');
+    Route::post('/profil/player', [HalamanController::class, 'storePlayer'])->name('profil.storePlayer');
     Route::delete('/profil/{id}', [HalamanController::class, 'destroy'])->name('profil.destroy');
     Route::post('/profil/tim/update', [HalamanController::class, 'updateProfilTim'])->name('profil.tim.update');
     Route::post('/profil/tim/edit', [HalamanController::class, 'editProfilTim'])->name('profil.tim.edit');
@@ -39,8 +40,6 @@ Route::middleware('auth')->group(function () {
     // Fitur Find & Swipe
     Route::get('/find', [TeamSwipeController::class, 'index'])->name('find');
     Route::post('/swipe-action', [TeamSwipeController::class, 'handleSwipe'])->name('swipe.action');
-
-    // Legacy swipe route for backward compatibility
     Route::post('/swipe', [TeamSwipeController::class, 'swipe'])->name('swipe');
 
     // Like user (optional anonymous fallback check)
@@ -57,4 +56,8 @@ Route::middleware('auth')->group(function () {
     // Halaman tambahan
     Route::get('/sewa', [HalamanController::class, 'showSewaForm'])->name('sewa');
     Route::get('/message', [HalamanController::class, 'showMessageForm'])->name('message');
+    Route::get('/message/contact/{contactId}', [HalamanController::class, 'showMessageForm'])->name('message.with');
+    Route::get('/message/add-contact/{enemyId}', [HalamanController::class, 'addContactAndRedirect'])->name('message.addContact');
+    Route::post('/message/send/{contactId}', [HalamanController::class, 'sendMessage'])->name('message.send');
 });
+

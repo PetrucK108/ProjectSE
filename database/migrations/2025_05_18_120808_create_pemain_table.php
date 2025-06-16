@@ -15,9 +15,6 @@ return new class extends Migration
             $table->integer('umur');
             $table->string('jurusan');
             $table->string('angkatan');
-            $table->integer('gol')->default(0);
-            $table->integer('assist')->default(0);
-            $table->integer('clean_sheet')->default(0);
             $table->timestamps();
         });
     }

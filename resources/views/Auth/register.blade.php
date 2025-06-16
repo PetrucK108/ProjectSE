@@ -112,53 +112,175 @@
             color: #e0e7ef;
             background: #334155;
         }
+
+        select[name="fakultas"] {
+            color: #e0e7ef;
+            background: transparent;
+        }
+
+        select[name="fakultas"]:focus {
+            color: #e0e7ef;
+        }
+
+        select[name="fakultas"] option {
+            color: #181829;
+            background: #fff;
+        }
+
+        select[name="fakultas"] option:checked,
+        select[name="fakultas"]:focus>option:checked {
+            color: #e0e7ef;
+            background: #334155;
+        }
     </style>
 </head>
 
-<body class="bg-gray-900 flex items-center justify-center h-screen text-white">
-    <div class="neon-outline w-[420px] rounded-xl shadow-2xl">
-        <div class="card-content p-10">
-            <h2 class="text-2xl font-bold mb-8 text-center text-[#e0e7ef] tracking-wide">Register</h2>
-            <form method="POST" action="{{ route('register') }}">
-                @csrf
+<body class="bg-gradient-to-br from-gray-900 via-gray-950 to-blue-950 flex items-center justify-center min-h-screen text-white">
+    <div class="relative flex flex-col items-center justify-center w-full min-h-screen">
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+            <div class="w-[480px] h-[480px] rounded-3xl bg-gradient-to-br from-blue-700/30 via-cyan-400/10 to-indigo-800/20 blur-2xl"></div>
+        </div>
+        <div class="neon-outline w-[420px] rounded-xl shadow-2xl z-10">
+            <div class="card-content p-10">
+                <h2 class="text-3xl font-extrabold mb-8 text-center text-[#e0e7ef] tracking-wide drop-shadow-lg">Register
+                </h2>
+                <form method="POST" action="{{ route('register.submit') }}">
+                    @csrf
 
-                @if ($errors->any())
-                <div class="mb-4 text-[#f87171]">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                        <li>- {{ $error }}</li>
-                        @endforeach
-                    </ul>
+                    @if ($errors->any())
+                    <div class="mb-4 text-[#f87171]">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                            <li>- {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+
+                    <input type="text" name="name" placeholder="Nama Lengkap" required
+                        class="w-full mb-4 px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8] placeholder:text-[#64748b] transition text-base" />
+                    <input type="text" name="phone" placeholder="No Telepon" required
+                        class="w-full mb-4 px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8] placeholder:text-[#64748b] transition text-base" />
+                    <input type="email" name="email" placeholder="Gmail (example@gmail.com)" required
+                        class="w-full mb-4 px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8] placeholder:text-[#64748b] transition text-base"
+                        pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$" title="Masukkan Gmail yang valid" />
+                    <input type="password" name="password" placeholder="Password" required
+                        class="w-full mb-4 px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8] placeholder:text-[#64748b] transition text-base" />
+
+                    <div class="mb-6">
+                        <label for="fakultas" class="block text-[#e0e7ef] mb-1 font-semibold">Fakultas</label>
+                        <select id="fakultas" name="fakultas" required
+                            class="w-full mb-4 px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8]">
+                            <option value="" disabled selected style="color:#64748b;background:#f1f5f9;">Pilih Fakultas
+                            </option>
+                            <option value="Binus Business School">🎓 Binus Business School (Soshum)</option>
+                            <option value="Faculty of Economics and Communication">📊 Faculty of Economics and Communication
+                                (Soshum & D3)
+                            </option>
+                            <option value="Faculty of Engineering">🛠 Faculty of Engineering (Saintek)</option>
+                            <option value="Faculty of Humanities">🏛 Faculty of Humanities</option>
+                            <option value="School of Computer Science">💻 School of Computer Science (Saintek)</option>
+                            <option value="School of Design">🎨 School of Design</option>
+                            <option value="School of Information Systems">🖥 School of Information Systems</option>
+                        </select>
+                        <label for="jurusan" class="block text-[#e0e7ef] mb-1 font-semibold">Jurusan</label>
+                        <select id="jurusan" name="jurusan" required
+                            class="w-full px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8]">
+                            <option value="" disabled selected>Pilih Jurusan</option>
+                        </select>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-2 bg-gradient-to-r from-cyan-400 to-blue-600 text-white font-semibold rounded shadow btn-press transition text-lg hover:scale-105 hover:shadow-xl">
+                        Signup
+                    </button>
+                </form>
+                <div class="mt-4 text-center">
+                    <a href="{{ route('login') }}" class="text-[#7dd3fc] hover:text-[#818cf8] hover:underline transition">Sudah
+                        punya akun? Login</a>
                 </div>
-                @endif
-
-                <input type="text" name="name" placeholder="Nama Lengkap" required
-                    class="w-full mb-4 px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8] placeholder:text-[#64748b] transition" />
-                <input type="text" name="phone" placeholder="No Telepon" required
-                    class="w-full mb-4 px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8] placeholder:text-[#64748b] transition" />
-                <input type="email" name="email" placeholder="Email" required
-                    class="w-full mb-4 px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8] placeholder:text-[#64748b] transition" />
-                <input type="password" name="password" placeholder="Password" required
-                    class="w-full mb-4 px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8] placeholder:text-[#64748b] transition" />
-
-                <select name="jurusan" required
-                    class="w-full mb-6 px-0 py-2 bg-transparent border-b border-[#334155] text-[#e0e7ef] focus:outline-none focus:border-[#38bdf8]">
-                    <option value="" disabled selected class="text-gray-400">Pilih Jurusan</option>
-                    <option value="Teknik Informatika">Teknik Informatika</option>
-                    <option value="Sistem Informasi">Sistem Informasi</option>
-                    <option value="Teknik Elektro">Teknik Elektro</option>
-                    <option value="Teknik Mesin">Teknik Mesin</option>
-                    <option value="Teknik Sipil">Teknik Sipil</option>
-                </select>
-
-                <button type="submit"
-                    class="w-full py-2 bg-white text-[#181829] font-semibold rounded shadow btn-press transition">Signup</button>
-            </form>
-            <div class="mt-4 text-center">
-                <a href="{{ route('login') }}" class="text-[#7dd3fc] hover:text-[#818cf8] hover:underline transition">Sudah punya akun? Login</a>
             </div>
         </div>
     </div>
 </body>
+<script>
+    const jurusanMap = {
+        "Binus Business School": [
+            "Management",
+            "Global Business Marketing",
+            "International Business Management"
+        ],
+        "Faculty of Economics and Communication": [
+            "Tourism",
+            "Accounting",
+            "Marketing Communication",
+            "Mass Communication",
+            "Taxation",
+            "Business Hotel Management (Diploma)",
+            "Hotel Management (Diploma)"
+        ],
+        "Faculty of Engineering": [
+            "Civil Engineering",
+            "Industrial Engineering",
+            "Architecture",
+            "Computer Engineering"
+        ],
+        "Faculty of Humanities": [
+            "Chinese Literature",
+            "English Literature",
+            "International Relations",
+            "Japanese Literature",
+            "Law – Business Law",
+            "Primary Teacher Education",
+            "Psychology"
+        ],
+        "School of Computer Science": [
+            "Computer Science",
+            "Computer Science – Software Engineering",
+            "Cyber Security",
+            "Data Science",
+            "Game Application and Technology",
+            "Mobile Application and Technology"
+        ],
+        "School of Design": [
+            "Visual Communication Design – Animation",
+            "Visual Communication Design – New Media",
+            "Visual Communication Design – Creative Advertising",
+            "Interior Design"
+        ],
+        "School of Information Systems": [
+            "Information Systems",
+            "Business Analytics",
+            "Business Information Technology",
+            "Information Systems Accounting and Auditing"
+        ]
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const fakultasSelect = document.getElementById('fakultas');
+        const jurusanSelect = document.getElementById('jurusan');
+
+        fakultasSelect.addEventListener('change', function () {
+            const selectedFakultas = this.value;
+            jurusanSelect.innerHTML = '<option value="" disabled selected>Pilih Jurusan</option>';
+            if (jurusanMap[selectedFakultas]) {
+                jurusanMap[selectedFakultas].forEach(jurusan => {
+                    const opt = document.createElement('option');
+                    opt.value = jurusan;
+                    opt.textContent = jurusan;
+                    jurusanSelect.appendChild(opt);
+                });
+            }
+        });
+    });
+
+    // Disable browser back button
+    if (window.history && window.history.pushState) {
+        window.history.pushState('forward', null, window.location.href);
+        window.onpopstate = function () {
+            window.history.pushState('forward', null, window.location.href);
+        };
+    }
+</script>
 
 </html>

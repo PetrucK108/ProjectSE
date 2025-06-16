@@ -19,9 +19,6 @@ class Pemain extends Model
         'jurusan',
         'angkatan',
         'posisi',
-        'gol',
-        'assist',
-        'goals_conceded',
     ];
 
 
